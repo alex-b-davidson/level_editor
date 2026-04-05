@@ -14,6 +14,7 @@ flags = pygame.RESIZABLE | pygame.SCALED
 
 screen = pygame.display.set_mode((960, 480), flags=flags)
 pygame.display.set_caption('level_editor_v1')
+file_manager.load_default_tileset()
 # Load all GUI assets (tileset, toolbar, cursors).
 # Must happen after pygame.init() and before draw_canvas(), because load_assets()
 # sets gui.canvas_offset_y to toolbar_height — needed for correct canvas placement.

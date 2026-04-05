@@ -15,23 +15,23 @@ time.sleep(0.5)
 # 'global' declarations without accidentally creating local copies.
 # ------------------------------------------------------------------------------
 
-tileset_list = []
-tileset = None              # The loaded tileset image surface
+#file_manager.tileset_list = []
+#file_manager.tileset = None              # The loaded file_manager.tileset image surface
 tileset_index = 0           # will cycle based on click in get_clicks_on_icons()
 ts_active_index = 0
 empty_tile = None
-tileset_width = 0           # Width of the tileset in pixels
-tileset_height = 0          # Height of the tileset in pixels
-cursor_tile = None          # Cursor image displayed when hovering over the tileset
+#file_manager.tileset_width = 0           # Width of the file_manager.tileset in pixels
+#file_manager.tileset_height = 0          # Height of the file_manager.tileset in pixels
+cursor_tile = None          # Cursor image displayed when hovering over the file_manager.tileset
 toolbar_on_right = None          # Toolbar image displayed at the top of the screen
 
-cursor_over_tileset = False # True when the mouse is over the tileset panel
+cursor_over_tileset = False # True when the mouse is over the file_manager.tileset panel
 cursor_over_canvas = False  # True when the mouse is over the canvas area
 
-tileset_drag = False        # True while the user is dragging to make a selection on the tileset
+tileset_drag = False        # True while the user is dragging to make a selection on the file_manager.tileset
 tileset_drag_start = (0, 0)         # Tile index (col, row) where the drag started
 tileset_drag_end = (0, 0)   # Tile index (col, row) where the drag currently ends
-has_ts_selection = False       # True once the user has completed at least one tileset selection
+has_ts_selection = False       # True once the user has completed at least one file_manager.tileset selection
 
 canvas_drag = False # True while user is right-click dragging on canvas
 canvas_drag_start = (0, 0) # canvas index where the drag starts
@@ -83,19 +83,19 @@ clicking_on_icons = False # need flag to not draw when clicking
 def load_assets():
     """Load all images used by the GUI. Call once after pygame.init().
     Sets canvas_offset_y to toolbar height so the canvas starts below the toolbar.
-    Returns (tileset_width, tileset_height)."""
-    global tileset, tileset_width, tileset_height, cursor_tile, toolbar_on_right, toolbar_corner, top_right_corner, bottom_left_corner, bottom_right_corner 
+    Returns (file_manager.tileset_width, file_manager.tileset_height)."""
+    global cursor_tile, toolbar_on_right, toolbar_corner, top_right_corner, bottom_left_corner, bottom_right_corner 
     global toolbar_dark_line, toolbar_light_line, canvas_offset_y, toolbar_top_line, toolbar_bottom_line, toolbar_left_line, toolbar_right_line
     global empty_tile, arrows_whole, arrow_inactive_left, arrow_inactive_right, arrow_active_left, arrow_active_right, arrow_pressed_left, arrow_pressed_right
-    global ts_label, tileset_list, layer_active, layer_inactive, all_nums, num_list, eye_inactive, eye_active, eye_pressed, select_active_layer_active
+    global ts_label, layer_active, layer_inactive, all_nums, num_list, eye_inactive, eye_active, eye_pressed, select_active_layer_active
     global select_active_layer_inactive, select_active_layer_clicked, select_ts_dir_inactive, select_ts_dir_active
 
 
-    tileset_list = [pygame.image.load(rf'assets\tilesets\{tileset}').convert_alpha().copy() for tileset in os.listdir(r'assets\tilesets')]
-    #tileset = pygame.image.load(r'assets\tilesets\tileset_2.png').convert_alpha()
-    tileset = tileset_list[0]
-    tileset_width = tileset.get_width()
-    tileset_height = tileset.get_height()
+    # file_manager.tileset_list = [pygame.image.load(rf'assets\tilesets\{file_manager.tileset}').convert_alpha().copy() for file_manager.tileset in os.listdir(r'assets\tilesets')]
+    # #file_manager.tileset = pygame.image.load(r'assets\tilesets\tileset_2.png').convert_alpha()
+    # file_manager.tileset = file_manager.tileset_list[0]
+    # file_manager.tileset_width = file_manager.tileset.get_width()
+    # file_manager.tileset_height = file_manager.tileset.get_height()
     empty_tile = pygame.image.load(r'assets\empty.png').convert()
     empty_tile.set_colorkey((253, 77, 211))
 
@@ -111,8 +111,8 @@ def load_assets():
     toolbar_dark_line = _toolbar_corners_and_sides.subsurface((level.tile_size, 0, level.tile_size, level.tile_size))
     toolbar_light_line = _toolbar_corners_and_sides.subsurface((level.tile_size*2, 0, level.tile_size, level.tile_size))
     
-    toolbar_top_line = pygame.transform.scale(toolbar_dark_line, (tileset_width - level.tile_size*2, level.tile_size))
-    toolbar_bottom_line = pygame.transform.scale(pygame.transform.flip(toolbar_dark_line, False, True), (tileset_width - level.tile_size*2, level.tile_size))
+    toolbar_top_line = pygame.transform.scale(toolbar_dark_line, (file_manager.tileset_width - level.tile_size*2, level.tile_size))
+    toolbar_bottom_line = pygame.transform.scale(pygame.transform.flip(toolbar_dark_line, False, True), (file_manager.tileset_width - level.tile_size*2, level.tile_size))
     toolbar_left_line = toolbar_light_line
     toolbar_right_line = pygame.transform.flip(toolbar_light_line, True, False)
 
@@ -144,7 +144,7 @@ def load_assets():
     num_list = [all_nums.subsurface(x, 0, 32, 32) for x in range(0, all_nums.get_width(), 32)]
 
 
-    return tileset_width, tileset_height
+    return file_manager.tileset_width, file_manager.tileset_height
 
 
 # ------------------------------------------------------------------------------
@@ -153,19 +153,19 @@ def load_assets():
 # ------------------------------------------------------------------------------
 
 def get_snapped_tileset_pos(screen: pygame.Surface):
-    """Return the snapped (x, y) pixel position of the tile under the cursor on the tileset.
+    """Return the snapped (x, y) pixel position of the tile under the cursor on the file_manager.tileset.
     'Snapped' means locked to the nearest tile boundary.
     Also updates cursor_over_tileset.
-    Returns (0, 0) if the cursor is not over the tileset."""
+    Returns (0, 0) if the cursor is not over the file_manager.tileset."""
     global cursor_over_tileset
 
     cursor = pygame.mouse.get_pos()
     cv_snapped_x = 0
     cv_snapped_y = 0
 
-    # The tileset panel is pinned to the right edge of the screen
-    tileset_x = screen.get_width() - tileset_width
-    cursor_over_tileset = (cursor[0] >= tileset_x and cursor[1] < tileset_height)
+    # The file_manager.tileset panel is pinned to the right edge of the screen
+    tileset_x = screen.get_width() - file_manager.tileset_width
+    cursor_over_tileset = (cursor[0] >= tileset_x and cursor[1] < file_manager.tileset_height)
 
     if cursor_over_tileset:
         # Convert pixel position to tile index, then back to snapped pixel position
@@ -180,14 +180,14 @@ def get_snapped_tileset_pos(screen: pygame.Surface):
 def get_canvas_indices(screen: pygame.Surface):
     """Return the (col, row) tile indices under the mouse cursor on the canvas.
     Also updates cursor_over_canvas.
-    Returns None if the cursor is over the tileset or toolbar."""
+    Returns None if the cursor is over the file_manager.tileset or toolbar."""
     global cursor_over_canvas
 
     cursor = pygame.mouse.get_pos()
     cursor_over_canvas = not cursor_over_tileset
 
     # Ignore the toolbar area — the canvas only starts below it
-    if cursor_over_canvas and cursor[0] < screen.get_width() - tileset_width:
+    if cursor_over_canvas and cursor[0] < screen.get_width() - file_manager.tileset_width:
         # Subtract the canvas offset to account for panning, then convert to tile indices
         col = (cursor[0] - canvas_offset_x) // level.tile_size
         row = (cursor[1] - canvas_offset_y) // level.tile_size
@@ -195,11 +195,11 @@ def get_canvas_indices(screen: pygame.Surface):
 
 
 def update_tileset_drag_end(screen: pygame.Surface, cv_snapped_x, cv_snapped_y):
-    """While a tileset drag is active, update the tile index of the drag's current end point.
+    """While a file_manager.tileset drag is active, update the tile index of the drag's current end point.
     Called every frame so the selection rect tracks the cursor in real time."""
     global tileset_drag_end
 
-    tileset_x = screen.get_width() - tileset_width
+    tileset_x = screen.get_width() - file_manager.tileset_width
 
     if tileset_drag and cursor_over_tileset:
         # Convert snapped pixel position back to tile indices
@@ -217,12 +217,12 @@ def update_canvas_drag_end(cv_ind_x: int, cv_ind_y: int):
 
 
 def update_tileset_selection_cursor(screen: pygame.Surface):
-    """Calculate and return a pygame.Rect representing the current selection on the tileset.
+    """Calculate and return a pygame.Rect representing the current selection on the file_manager.tileset.
     Handles dragging in any direction (up-left, down-right, etc.) using min/max.
-    Clips the result to the tileset panel bounds.
+    Clips the result to the file_manager.tileset panel bounds.
     Returns None if no drag or selection is active."""
 
-    tileset_x = screen.get_width() - tileset_width
+    tileset_x = screen.get_width() - file_manager.tileset_width
 
     if tileset_drag or has_ts_selection:
         # Use min/max so the rect is always correctly oriented regardless of drag direction
@@ -231,7 +231,7 @@ def update_tileset_selection_cursor(screen: pygame.Surface):
         width = abs(tileset_drag_end[0] - tileset_drag_start[0]) * level.tile_size + level.tile_size
         height = abs(tileset_drag_end[1] - tileset_drag_start[1]) * level.tile_size + level.tile_size
 
-        bounds_rect = pygame.Rect((screen.get_width() - tileset_width, 0, tileset_width, tileset_height))
+        bounds_rect = pygame.Rect((screen.get_width() - file_manager.tileset_width, 0, file_manager.tileset_width, file_manager.tileset_height))
         selection_rect = pygame.Rect((x, y, width, height))
         clipped_rect = selection_rect.clip(bounds_rect)
         return clipped_rect
@@ -258,7 +258,7 @@ def update_canvas_selection_cursor(screen:pygame.Surface, cv_ind_x, cv_ind_y):
         clipped_y = len(hard_limited_y)
 
         # get bounds rect
-        bounds_rect = pygame.Rect((0, 0, screen.get_width()-tileset_width, screen.get_height()))
+        bounds_rect = pygame.Rect((0, 0, screen.get_width()-file_manager.tileset_width, screen.get_height()))
 
         # set selection rect
         selection_rect = pygame.Rect((x+canvas_offset_x, y+canvas_offset_y, clipped_x*level.tile_size, clipped_y*level.tile_size))
@@ -295,11 +295,11 @@ def update_canvas_pan(screen: pygame.Surface):
         scroll_canvas_origin = current_mouse_pos
 
     # Clamp horizontal offset.
-    # Only restrict if the canvas is wider than the available area (screen minus tileset panel).
-    if canvas_width > screen.get_width() - tileset_width:
+    # Only restrict if the canvas is wider than the available area (screen minus file_manager.tileset panel).
+    if canvas_width > screen.get_width() - file_manager.tileset_width:
         neg_raw_x = -(canvas_width - screen.get_width())
         neg_clamp_x = -(-(neg_raw_x) // level.tile_size * level.tile_size)
-        canvas_offset_x = pygame.math.clamp(canvas_offset_x, neg_clamp_x-level.tile_size - tileset_width, 0)
+        canvas_offset_x = pygame.math.clamp(canvas_offset_x, neg_clamp_x-level.tile_size - file_manager.tileset_width, 0)
     else:
         canvas_offset_x = 0
 
@@ -320,14 +320,14 @@ def update_canvas_pan(screen: pygame.Surface):
 def update_screen_layout(screen: pygame.Surface):
     """sets the x for icons in toolbar after screen resize"""
 
-    arrow_icon_x = screen.get_width() - tileset_width + level.tile_size*2
-    ts_label_x = screen.get_width() - tileset_width + tileset_width//2
-    layer_icon_x = screen.get_width() - tileset_width + tileset_width//2 - layer_inactive.get_width()//2
+    arrow_icon_x = screen.get_width() - file_manager.tileset_width + level.tile_size*2
+    ts_label_x = screen.get_width() - file_manager.tileset_width + file_manager.tileset_width//2
+    layer_icon_x = screen.get_width() - file_manager.tileset_width + file_manager.tileset_width//2 - layer_inactive.get_width()//2
     layer_eye_x = layer_icon_x + (layer_inactive.get_width())
     select_active_layer_icon_x = layer_icon_x - level.tile_size*2
     select_ts_dir_icon_y = screen.get_height() - level.tile_size*3
 
-    screen.blit(layer_active, (layer_icon_x, tileset_height + level.tile_size)) # TODO should be moved to DRAW?
+    screen.blit(layer_active, (layer_icon_x, file_manager.tileset_height + level.tile_size)) # TODO should be moved to DRAW?
     return(arrow_icon_x, ts_label_x, layer_icon_x, layer_eye_x, select_active_layer_icon_x, select_ts_dir_icon_y) 
 
 
@@ -337,12 +337,12 @@ def update_toolbar_flags(arrow_icon_x, layer_icon_x, layer_eye_x, sal_icon_x, ts
     """updates global flags for cursor over toolbal icons"""
     global cursor_over_left_arrow, cursor_over_right_arrow, cursor_over_layer_icon, cursor_over_layer_eye, cursor_over_select_active_layer, cursor_over_ts_dir_icon
 
-    left_arrow_rect = pygame.Rect((arrow_icon_x, tileset_height+level.tile_size, arrow_active_left.get_width(), arrow_active_left.get_height()))
-    right_arrow_rect = pygame.Rect((arrow_icon_x+tileset_width- level.tile_size*6, tileset_height+level.tile_size, arrow_active_left.get_width(), arrow_active_left.get_height()))
+    left_arrow_rect = pygame.Rect((arrow_icon_x, file_manager.tileset_height+level.tile_size, arrow_active_left.get_width(), arrow_active_left.get_height()))
+    right_arrow_rect = pygame.Rect((arrow_icon_x+file_manager.tileset_width- level.tile_size*6, file_manager.tileset_height+level.tile_size, arrow_active_left.get_width(), arrow_active_left.get_height()))
 
-    layer_icon_rect = pygame.Rect((layer_icon_x, tileset_height+level.tile_size*4, layer_inactive.get_width(), layer_inactive.get_height()))
-    layer_eye_rect = pygame.Rect((layer_eye_x, tileset_height+level.tile_size*4, eye_inactive.get_width(), eye_inactive.get_height()))
-    select_active_layer_rect = pygame.Rect((sal_icon_x, tileset_height+level.tile_size*4, select_active_layer_active.get_width(), select_active_layer_active.get_height()))
+    layer_icon_rect = pygame.Rect((layer_icon_x, file_manager.tileset_height+level.tile_size*4, layer_inactive.get_width(), layer_inactive.get_height()))
+    layer_eye_rect = pygame.Rect((layer_eye_x, file_manager.tileset_height+level.tile_size*4, eye_inactive.get_width(), eye_inactive.get_height()))
+    select_active_layer_rect = pygame.Rect((sal_icon_x, file_manager.tileset_height+level.tile_size*4, select_active_layer_active.get_width(), select_active_layer_active.get_height()))
 
     ts_dir_rect = pygame.Rect((arrow_icon_x-level.tile_size, ts_dir_icon_y, select_ts_dir_inactive.get_width(), select_ts_dir_inactive.get_height()))
 
@@ -379,16 +379,16 @@ def update_toolbar_flags(arrow_icon_x, layer_icon_x, layer_eye_x, sal_icon_x, ts
 
 
 def update_current_tileset():
-    """Change the tileset when arrows are clicked in the toolbar"""
-    global tileset
+    """Change the file_manager.tileset when arrows are clicked in the toolbar"""
+    #global file_manager.tileset
 
-    tileset = tileset_list[tileset_index] # TODO call this after event choose tileset
+    file_manager.tileset = file_manager.tileset_list[tileset_index] # TODO call this after event choose file_manager.tileset
 
 def update_flag_mouse_over_toolbar(screen: pygame.Surface):
     """update the clicking_on_icons bool if mouse x is over toolbar"""
     global clicking_on_icons
 
-    if pygame.mouse.get_pos()[0] > screen.get_width() - tileset_width and not cursor_over_tileset:
+    if pygame.mouse.get_pos()[0] > screen.get_width() - file_manager.tileset_width and not cursor_over_tileset:
         clicking_on_icons = True
     else:
         clicking_on_icons = False
@@ -399,10 +399,10 @@ def update_flag_mouse_over_toolbar(screen: pygame.Surface):
 # ------------------------------------------------------------------------------
 
 def draw_tileset(screen: pygame.Surface):
-    """Blit the tileset to the right edge of the screen.
+    """Blit the file_manager.tileset to the right edge of the screen.
     The magenta rect behind it acts as a background/debug fill."""
-    pygame.draw.rect(screen, (150, 0, 200), (screen.get_width() - tileset_width, 0, tileset_width, tileset_height))
-    screen.blit(tileset, (screen.get_width() - tileset_width, 0))
+    pygame.draw.rect(screen, (150, 0, 200), (screen.get_width() - file_manager.tileset_width, 0, file_manager.tileset_width, file_manager.tileset_height))
+    screen.blit(file_manager.tileset, (screen.get_width() - file_manager.tileset_width, 0))
 
 
 def draw_canvas():
@@ -429,7 +429,7 @@ def draw_canvas():
 
 
 def draw_hovering_tile_cursor(screen: pygame.Surface, cv_snapped_x, cv_snapped_y):
-    """Draw a single-tile highlight under the cursor when hovering over the tileset.
+    """Draw a single-tile highlight under the cursor when hovering over the file_manager.tileset.
     Hidden while actively dragging a selection."""
     if not tileset_drag and cursor_over_tileset:
         pygame.draw.rect(screen, (0, 255, 255),
@@ -437,10 +437,10 @@ def draw_hovering_tile_cursor(screen: pygame.Surface, cv_snapped_x, cv_snapped_y
 
 
 def draw_tileset_selection_cursor(screen: pygame.Surface, selection_rect):
-    """Draw the selection rectangle during and after a drag on the tileset.
-    Clips the rect to the tileset panel so it never draws outside the panel."""
+    """Draw the selection rectangle during and after a drag on the file_manager.tileset.
+    Clips the rect to the file_manager.tileset panel so it never draws outside the panel."""
     if selection_rect is not None:
-        bounds_rect = pygame.Rect(screen.get_width() - tileset_width, 0, tileset_width, tileset_height)
+        bounds_rect = pygame.Rect(screen.get_width() - file_manager.tileset_width, 0, file_manager.tileset_width, file_manager.tileset_height)
         clipped_cursor = selection_rect.clip(bounds_rect)
         pygame.draw.rect(screen, (255, 255, 255), clipped_cursor, 1)
 
@@ -454,7 +454,7 @@ def draw_canvas_cursor(screen: pygame.Surface, selection: pygame.Rect, ind_x, in
     cv_snapped_y = toolbar_on_right.get_height()
 
     # Only draw when: over the canvas, below the toolbar, and not currently panning
-    if not canvas_drag and not cursor_over_tileset and current_pos[0] < screen.get_width() - tileset_width and not scroll_canvas and ind_x < level.canv_x + 1 and ind_y < level.canv_y + 1:
+    if not canvas_drag and not cursor_over_tileset and current_pos[0] < screen.get_width() - file_manager.tileset_width and not scroll_canvas and ind_x < level.canv_x + 1 and ind_y < level.canv_y + 1:
         # Convert screen position to tile index accounting for canvas pan offset,
         # then convert back to snapped screen position
         col = (current_pos[0] - canvas_offset_x) // level.tile_size
@@ -480,10 +480,10 @@ def draw_canvas_selection_cursor(screen: pygame.Surface, selection_rect: pygame.
 
 
 def draw_subsurface_tileset(screen: pygame.Surface, selection: pygame.Surface, sub_x, sub_y):
-    """Blit the current tileset selection image onto the canvas at the given tile indices.
+    """Blit the current file_manager.tileset selection image onto the canvas at the given tile indices.
     Used to preview the tile placement before the user clicks.
     Hidden while panning so the preview doesn't drift out of sync with the grid."""
-    if not canvas_drag and selection is not None and not cursor_over_tileset and not scroll_canvas and not tileset_drag and sub_x < level.canv_x + 1 and sub_y < level.canv_y + 1 and not pygame.mouse.get_pos()[0] > screen.get_width()-tileset_width:
+    if not canvas_drag and selection is not None and not cursor_over_tileset and not scroll_canvas and not tileset_drag and sub_x < level.canv_x + 1 and sub_y < level.canv_y + 1 and not pygame.mouse.get_pos()[0] > screen.get_width()-file_manager.tileset_width:
 
         # check if any of the selection falls outside the canvas
         col_coords_x = list(range(sub_x, sub_x+(selection.get_width()//level.tile_size), 1))
@@ -494,7 +494,7 @@ def draw_subsurface_tileset(screen: pygame.Surface, selection: pygame.Surface, s
         hard_limited_coords_y = [i for i in col_coords_y if i < level.canv_y + 1]
 
         # Do the same for x, y, under tileset_x and screen.get(height) (soft limit of drawing)
-        soft_limited_coords_x = [i for i in col_coords_x if i*level.tile_size+canvas_offset_x < (screen.get_width() - tileset_width)]
+        soft_limited_coords_x = [i for i in col_coords_x if i*level.tile_size+canvas_offset_x < (screen.get_width() - file_manager.tileset_width)]
         soft_limited_coords_y = [i for i in col_coords_y if i*level.tile_size+canvas_offset_y < screen.get_height()]
 
 
@@ -520,7 +520,7 @@ def draw_from_dict(screen: pygame.Surface):
     Tile positions are offset by canvas_offset_x/y to account for panning."""
 
     # get cols and rows in screen size
-    tiles_in_x = list(range(int(0 - canvas_offset_x)//level.tile_size, int(screen.get_width() - tileset_width - canvas_offset_x)//level.tile_size, 1))
+    tiles_in_x = list(range(int(0 - canvas_offset_x)//level.tile_size, int(screen.get_width() - file_manager.tileset_width - canvas_offset_x)//level.tile_size, 1))
     tiles_in_y = list(range(int(0 - canvas_offset_y)//level.tile_size, int(screen.get_height() - canvas_offset_y)//level.tile_size, 1))
 
     for layer in range(0, level.max_layer+1, 1):
@@ -548,15 +548,15 @@ def draw_from_dict(screen: pygame.Surface):
 
 
 def draw_toolbar(screen: pygame.Surface):
-    """Draw the toolbar across the top of the screen from x=0 to the tileset panel edge.
+    """Draw the toolbar across the top of the screen from x=0 to the file_manager.tileset panel edge.
     Scales the toolbar image horizontally to fill the available width."""
     
-    x = screen.get_width() - tileset_width
-    y = tileset_height
-    width = tileset_width
-    height = screen.get_height() - tileset_height
+    x = screen.get_width() - file_manager.tileset_width
+    y = file_manager.tileset_height
+    width = file_manager.tileset_width
+    height = screen.get_height() - file_manager.tileset_height
     toolbar = pygame.transform.scale(toolbar_on_right, (width, height))
-    #screen.blit(toolbar, (screen.get_width() - tileset_width, tileset_height, toolbar.get_width(), toolbar.get_height()))
+    #screen.blit(toolbar, (screen.get_width() - file_manager.tileset_width, file_manager.tileset_height, toolbar.get_width(), toolbar.get_height()))
     screen.blit(toolbar, (x, y))
 
     # Decoration of toolbar
@@ -569,11 +569,11 @@ def draw_toolbar(screen: pygame.Surface):
     screen.blit(bottom_left_corner, (x, screen.get_height() - 16))
     screen.blit(bottom_right_corner, (screen.get_width() - 16, screen.get_height() - 16))
 
-    # draw the top and bottom lines at static tileset coords
+    # draw the top and bottom lines at static file_manager.tileset coords
     screen.blit(toolbar_top_line, (x+level.tile_size, y))
     screen.blit(toolbar_bottom_line, (x+level.tile_size, screen.get_height()-level.tile_size))
 
-    # for the side lines, I need to get the (screen height - tile size) - (tileset height + tile size)
+    # for the side lines, I need to get the (screen height - tile size) - (file_manager.tileset height + tile size)
     line_length = (screen.get_height()-level.tile_size) - (y+level.tile_size)
     trans_l_line = pygame.transform.smoothscale(toolbar_left_line, (level.tile_size, line_length))
     trans_r_line = pygame.transform.smoothscale(toolbar_right_line, (level.tile_size, line_length))
@@ -583,43 +583,43 @@ def draw_toolbar(screen: pygame.Surface):
 def draw_toolbar_icons(screen:pygame.Surface, arrow_icon_x, ts_label_x, layer_icon_x, layer_eye_x, sal_icon_x, ts_dir_icon_y):
     """Draw the icons on the toolbar"""
 
-    ts_label_y = tileset_height+level.tile_size
+    ts_label_y = file_manager.tileset_height+level.tile_size
     screen.blit(ts_label, (ts_label_x-ts_label.get_width()//2, ts_label_y))
 
     if cursor_over_left_arrow:
-        screen.blit(arrow_active_left, (arrow_icon_x, tileset_height + level.tile_size))
+        screen.blit(arrow_active_left, (arrow_icon_x, file_manager.tileset_height + level.tile_size))
     else:
-        screen.blit(arrow_inactive_left, (arrow_icon_x, tileset_height + level.tile_size))
+        screen.blit(arrow_inactive_left, (arrow_icon_x, file_manager.tileset_height + level.tile_size))
 
     if cursor_over_right_arrow:
-        screen.blit(arrow_active_right, (arrow_icon_x+tileset_width-level.tile_size*6, tileset_height+level.tile_size))
+        screen.blit(arrow_active_right, (arrow_icon_x+file_manager.tileset_width-level.tile_size*6, file_manager.tileset_height+level.tile_size))
     else:
-        screen.blit(arrow_inactive_right, (arrow_icon_x+tileset_width-level.tile_size*6, tileset_height+level.tile_size))
+        screen.blit(arrow_inactive_right, (arrow_icon_x+file_manager.tileset_width-level.tile_size*6, file_manager.tileset_height+level.tile_size))
 
 
     if cursor_over_layer_icon:
-        screen.blit(layer_active, (layer_icon_x, tileset_height+level.tile_size*4))
+        screen.blit(layer_active, (layer_icon_x, file_manager.tileset_height+level.tile_size*4))
     else:
-        screen.blit(layer_inactive, (layer_icon_x, tileset_height+level.tile_size*4))
+        screen.blit(layer_inactive, (layer_icon_x, file_manager.tileset_height+level.tile_size*4))
     
     # draw layer number
-    screen.blit(num_list[level.current_layer+1], (layer_icon_x+level.tile_size*5, tileset_height+level.tile_size*4))
+    screen.blit(num_list[level.current_layer+1], (layer_icon_x+level.tile_size*5, file_manager.tileset_height+level.tile_size*4))
 
     if not layer_eye_pressed:
         if cursor_over_layer_eye:
-            screen.blit(eye_active, (layer_eye_x, tileset_height+level.tile_size*4))
+            screen.blit(eye_active, (layer_eye_x, file_manager.tileset_height+level.tile_size*4))
         else:
-            screen.blit(eye_inactive, (layer_eye_x, tileset_height+level.tile_size*4))
+            screen.blit(eye_inactive, (layer_eye_x, file_manager.tileset_height+level.tile_size*4))
     elif layer_eye_pressed:
-        screen.blit(eye_pressed, (layer_eye_x, tileset_height+level.tile_size*4))
+        screen.blit(eye_pressed, (layer_eye_x, file_manager.tileset_height+level.tile_size*4))
 
     if not select_active_layer:
         if cursor_over_select_active_layer:
-            screen.blit(select_active_layer_active, (sal_icon_x, tileset_height+level.tile_size*4))
+            screen.blit(select_active_layer_active, (sal_icon_x, file_manager.tileset_height+level.tile_size*4))
         else:
-            screen.blit(select_active_layer_inactive, (sal_icon_x, tileset_height+level.tile_size*4))
+            screen.blit(select_active_layer_inactive, (sal_icon_x, file_manager.tileset_height+level.tile_size*4))
     elif select_active_layer:
-        screen.blit(select_active_layer_clicked, (sal_icon_x, tileset_height+level.tile_size*4))
+        screen.blit(select_active_layer_clicked, (sal_icon_x, file_manager.tileset_height+level.tile_size*4))
 
     if cursor_over_ts_dir_icon:
         screen.blit(select_ts_dir_active, (arrow_icon_x-level.tile_size, ts_dir_icon_y))
@@ -633,11 +633,11 @@ def draw_toolbar_icons(screen:pygame.Surface, arrow_icon_x, ts_label_x, layer_ic
 # ------------------------------------------------------------------------------
 
 def left_click_on_tileset(event: pygame.event.Event, screen: pygame.Surface, cv_snapped_x, cv_snapped_y):
-    """Handle left-click drag on the tileset to define a tile selection.
+    """Handle left-click drag on the file_manager.tileset to define a tile selection.
     Records tileset_drag_start on mouse down and finalises the selection on mouse up."""
     global tileset_drag, tileset_drag_start, has_ts_selection
 
-    tileset_x = screen.get_width() - tileset_width
+    tileset_x = screen.get_width() - file_manager.tileset_width
 
     if cursor_over_tileset:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -678,7 +678,7 @@ def mouse_scroll_pressed_over_canvas(event: pygame.event.Event):
     The actual offset update happens in update_canvas_pan() each frame."""
     global scroll_canvas, scroll_canvas_origin, canvas_offset_y
 
-    # Cancel panning if the cursor strays over the tileset panel
+    # Cancel panning if the cursor strays over the file_manager.tileset panel
     if cursor_over_tileset:
         scroll_canvas = False
 
@@ -699,11 +699,11 @@ def get_clicks_on_icons(event:pygame.event.Event):
     # to cycle through need active % n_tilesets
     if cursor_over_right_arrow and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
         # cycle the value up
-        tileset_index = (tileset_index+1) % len(tileset_list)
+        tileset_index = (tileset_index+1) % len(file_manager.tileset_list)
         sfx.play_click_sound()
     if cursor_over_left_arrow and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
         # cycle the value down
-        tileset_index = (tileset_index-1) % len(tileset_list)
+        tileset_index = (tileset_index-1) % len(file_manager.tileset_list)
         sfx.play_click_sound()
     if cursor_over_layer_icon and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
         level.current_layer = ((level.current_layer + 1) % level.max_layer)
@@ -724,18 +724,18 @@ def get_clicks_on_icons(event:pygame.event.Event):
 # ------------------------------------------------------------------------------
 
 def get_ts_selection(screen: pygame.Surface, selection: pygame.Rect):
-    """Extract and return the subsurface image from the tileset matching the selection rect.
-    Clips the selection to the tileset bounds before extracting to avoid out-of-bounds errors.
+    """Extract and return the subsurface image from the file_manager.tileset matching the selection rect.
+    Clips the selection to the file_manager.tileset bounds before extracting to avoid out-of-bounds errors.
     Also returns the tile-index origin (col, row) of the selection."""
-    x = (selection.x - (screen.get_width() - tileset_width)) // level.tile_size
+    x = (selection.x - (screen.get_width() - file_manager.tileset_width)) // level.tile_size
     y = selection.y // level.tile_size
 
-    # Clamp to tileset bounds before subsurfacing
-    bounds_rect = pygame.Rect((screen.get_width() - tileset_width, 0, tileset_width, tileset_height))
+    # Clamp to file_manager.tileset bounds before subsurfacing
+    bounds_rect = pygame.Rect((screen.get_width() - file_manager.tileset_width, 0, file_manager.tileset_width, file_manager.tileset_height))
     clipped_selection = selection.clip(bounds_rect)
     
 
-    selection_img = tileset.subsurface((
+    selection_img = file_manager.tileset.subsurface((
         x * level.tile_size,
         y * level.tile_size,
         clipped_selection.width,

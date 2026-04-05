@@ -212,8 +212,6 @@ def update_canvas_drag_end(cv_ind_x: int, cv_ind_y: int):
 
     if canvas_drag and cursor_over_canvas:
         canvas_drag_end = (cv_ind_x, cv_ind_y)
-        dup_dict = level.canv_dict
-        return(dup_dict) # return a copy of the current canvas dict for reference
 
 
 def update_tileset_selection_cursor(screen: pygame.Surface):
@@ -743,7 +741,7 @@ def get_ts_selection(screen: pygame.Surface, selection: pygame.Rect):
     ))
     return selection_img, x, y
 
-def get_cv_selection(screen:pygame.Surface, selection: pygame.Rect, dup_dict: dict):
+def get_cv_selection(screen:pygame.Surface, selection: pygame.Rect):
     global cv_selection_captured
     # make canvas selection surface size of selection
     cv_selection_surface = pygame.Surface((selection.width, selection.height), pygame.SRCALPHA)
@@ -763,9 +761,9 @@ def get_cv_selection(screen:pygame.Surface, selection: pygame.Rect, dup_dict: di
 
                     key = (col, row, layer)
 
-                    if key in dup_dict:
+                    if key in level.canv_dict:
 
-                        img, tile_type = dup_dict[key]
+                        img, tile_type = level.canv_dict[key]
                         img.set_alpha(255) # ensures full alpha when selecting hidden layers
 
                         blit_x = (col - min(tiles_in_x)) * level.tile_size
@@ -779,9 +777,9 @@ def get_cv_selection(screen:pygame.Surface, selection: pygame.Rect, dup_dict: di
 
                 key = (col, row, level.current_layer)
 
-                if key in dup_dict:
+                if key in level.canv_dict:
 
-                    img, tile_type = dup_dict[key]
+                    img, tile_type = level.canv_dict[key]
                     img.set_alpha(255) # ensures full alpha when selecting hidden layers
 
                     blit_x = (col - min(tiles_in_x)) * level.tile_size

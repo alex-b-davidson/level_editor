@@ -10,7 +10,7 @@ import file_manager
 pygame.init()
 
 # Create the window. flags=16 is pygame.RESIZABLE, allowing the user to resize.
-flags = pygame.RESIZABLE | pygame.SCALED
+flags = pygame.SCALED
 
 screen = pygame.display.set_mode((960, 480), flags=flags)
 pygame.display.set_caption('level_editor_v1')
@@ -28,7 +28,7 @@ max_screen_height = tileset_height * 3
 # Build the canvas grid surface once. It is a static surface that gets blitted
 # every frame at (canvas_offset_x, canvas_offset_y) to create the panning effect.
 level.populate_empty_canv_dict(gui.empty_tile)
-dup_dict = {}
+
 
 canvas_surface = gui.draw_canvas()
 
@@ -114,9 +114,9 @@ while running:
 
     # Track where the tileset drag ends (used to build the selection rect)
     gui.update_tileset_drag_end(screen, ts_snapped_x, ts_snapped_y)
-    result = gui.update_canvas_drag_end(cv_ind_x, cv_ind_y)
-    if result is not None:
-        dup_dict = result
+
+    gui.update_canvas_drag_end(cv_ind_x, cv_ind_y)
+
     # Recalculate the selection rect from drag start/end each frame
     ts_selection_rect = gui.update_tileset_selection_cursor(screen)
     cv_selection_rect = gui.update_canvas_selection_cursor(screen, cv_ind_x, cv_ind_y)
@@ -126,7 +126,7 @@ while running:
     if ts_selection_rect is not None:
         tileset_selection_img, subsurface_x, subsurface_y = gui.get_ts_selection(screen, ts_selection_rect)
     elif cv_selection_rect is not None and not gui.cv_selection_captured and not gui.canvas_drag:
-        tileset_selection_img, subsurface_x, subsurface_y = gui.get_cv_selection(screen, cv_selection_rect, dup_dict)
+        tileset_selection_img, subsurface_x, subsurface_y = gui.get_cv_selection(screen, cv_selection_rect) 
 
     # Left-click on the canvas to paint the current selection at the cursor position
     if pygame.mouse.get_pressed()[0] and gui.cursor_over_canvas and tileset_selection_img is not None and not gui.canvas_drag:
